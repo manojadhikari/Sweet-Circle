@@ -37,7 +37,8 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId: String,
-  secret: String
+  posts:[],
+  groups: []
 });
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
@@ -120,12 +121,21 @@ app.get("/register", function(req, res){
 });
 
 app.get("/secrets", function(req,res){
-  User.find({"secret":{$ne:null}}, function(error, foundUsers){
+  posts = [];
+  console.log(req.body);
+  User.find({"posts":{$ne:null}}, function(error, foundUsers){
     if (error){
       console.log(error);
     } else{
       if (foundUsers){
-        res.render("secrets", {usersWithSecrets: foundUsers});
+        foundUsers.forEach(function(user){
+          user.posts.forEach(function(post){
+            if (post.type == "events"){
+              posts.push(post);
+            }
+          })
+        })
+        res.render("secrets", {posts: posts});
       }
     }
   })
@@ -147,27 +157,49 @@ app.get("/submit", function(req, res){
 
 
 app.get("/secrets/:title", function(req,res){
+  posts = [];
   console.log(req.params.title);
-  Event.find({"eventName":{$ne:null}}, function(error, foundEvents){
+  User.find({"posts":{$ne:null}}, function(error, foundUsers){
     if (error){
       console.log(error);
     } else{
-      if (foundEvents){
-        console.log(foundEvents);
-        res.render("secrets", {usersWithSecrets: foundEvents});
+      if (foundUsers){
+        foundUsers.forEach(function(user){
+          user.posts.forEach(function(post){
+            if (post.type == req.params.title){
+              posts.push(post);
+            }
+          })
+        })
+        res.render("secrets", {posts: posts});
+
+        console.log(foundUsers);
       }
     }
   })
 });
 
 app.post("/submit", function(req, res){
-  const submittedSecret = req.body.secret;
+  const title = req.body.title;
+  const description = req.body.description;
+  const type = req.body.type;
+
+  const newPost  = {
+    title: title,
+    description: description,
+    type: type
+  }
+
   User.findById(req.user.id, function(err, foundUser){
     if (err){
       console.log(err);
     } else{
       if (foundUser){
-        foundUser.secret = submittedSecret;
+        if (foundUser.posts){
+          foundUser.posts.push(newPost);
+        } else{
+          foundUser.posts = [newPost];
+        }
         foundUser.save(function(){
           res.redirect("/secrets");
         })
