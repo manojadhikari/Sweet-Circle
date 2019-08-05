@@ -23,8 +23,7 @@
 This is a web based application that provides a commong platform for people to form communities. It is a convienient way to share/find information on events, jobs, housing and other topics with their community. Users can sign up using Google, Facebook, or their e-mail address. It is hosted on heroku. Click the link to play with a demo.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See [deployment](#deployment) for notes on how to deploy the project on a live system.
-You can also clone the project in you machine and run it. To run perform the following steps:
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See the link:------------------ for to play with  live system. You can also clone the project in you machine and run it. To run perform the following steps:
 1. Clone the project in your machine.
 2. Install npm and node.js.
 3. Navigate to the root of downloaded project using terminal.
