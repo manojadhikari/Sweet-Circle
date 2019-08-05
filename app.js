@@ -27,11 +27,13 @@ app.use(passport.session());//use passport for dealing with the session
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 mongoose.set("useCreateIndex", true);
 
-const eventsSchema = new mongoose.Schema({
+const postsSchema = new mongoose.Schema({
   title: String,
-  description: String
+  description: String,
+  type: String
 });
-const Event = mongoose.model("Event", eventsSchema);
+
+const Post = mongoose.model("Post", postsSchema);
 
 const userSchema = new mongoose.Schema({
   email: String,
@@ -158,6 +160,13 @@ app.get("/submit", function(req, res){
 
 app.get("/secrets/:title", function(req,res){
   posts = [];
+  // User.find({ "posts.$.title": req.params.title}, {'posts.$' : 1}, function(err, foundPosts){
+  //   if (err){
+  //     console.log(err);
+  //   } else{
+  //     console.log(foundPosts);
+  //   }
+  // });
   console.log(req.params.title);
   User.find({"posts":{$ne:null}}, function(error, foundUsers){
     if (error){
@@ -184,11 +193,11 @@ app.post("/submit", function(req, res){
   const description = req.body.description;
   const type = req.body.type;
 
-  const newPost  = {
+  const newPost  = new Post({
     title: title,
     description: description,
     type: type
-  }
+  });
 
   User.findById(req.user.id, function(err, foundUser){
     if (err){
