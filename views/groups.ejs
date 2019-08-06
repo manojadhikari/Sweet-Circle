@@ -18,7 +18,10 @@
                   </div>
                   <div class='card-body'>
                     <p><%=myGroups[j].description%></p>
-                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                    <form class="" action="/secrets" method="post">
+                      <button class="btn btn-block btn-dark" type="submit" href="/secrets" name="groupID" value="<%=myGroups[j]._id%>">View More</button>  
+                    </form>
+
                   </div>
                 </div>
               </div>
@@ -57,7 +60,7 @@
                   </div>
                   <div class='card-body'>
                     <p><%=myMembershipGroups[j].description%></p>
-                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                    <a class="btn btn-block btn-dark" role="button" href="/secrets">View More</a>
                   </div>
                 </div>
               </div>
@@ -94,7 +97,7 @@
                   </div>
                   <div class='card-body'>
                     <p><%=otherGroups[j].description%></p>
-                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                    <a class="btn btn-block btn-dark" role="button" href="/secrets">View More</a>
                     <a class="btn btn-success btn-block" role="button" href= "/group/join"> Join Group </a>
                   </div>
                 </div>

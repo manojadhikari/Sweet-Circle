@@ -165,6 +165,7 @@ app.get("/register", function(req, res){
 
 app.get("/secrets", function(req,res){
   posts = [];
+  console.log("In secrets get");
   console.log(req.body);
   User.find({"posts":{$ne:null}}, function(error, foundUsers){
     if (error){
@@ -299,6 +300,11 @@ app.post("/submit", function(req, res){
       }
     }
   })
+});
+
+app.post("/secrets", function(req, res){
+  console.log("In secret post");
+  console.log(req.body);
 });
 
 app.listen(3000, function(){
