@@ -1,2 +1,135 @@
 <%- include('partials/header') %>
+<section id="myGroups">
+  <h1>Created by me</h1>
+  <div id="myGroups-carousel" class="carousel slide" data-ride="false" data-interval="false">
+    <div class="carousel-inner">
+      <%for (let i=0; i<myGroups.length; i+=3){%>
+        <%if (i == 0){%>
+          <div class="carousel-item active">
+        <%}else{%>
+          <div class="carousel-item">
+        <%}%>
+          <div class='row'>
+            <%for (let j=i; j<i+3 && j<myGroups.length; j++){%>
+              <div class="pricing-column col-lg-4 col-md-6">
+                <div class="card">
+                  <div class='card-header'>
+                    <h3><%=myGroups[j].name%></h3>
+                  </div>
+                  <div class='card-body'>
+                    <p><%=myGroups[j].description%></p>
+                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                  </div>
+                </div>
+              </div>
+            <%}%>
+          </div>
+        </div>
+      <%}%>
+    <a class="carousel-control-prev" href="#myGroups-carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#myGroups-carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+  </div>
+
+</section>
+
+<hr>
+
+<section id="myMembershipGroups">
+  <h1>Groups I have joined</h1>
+  <div id="myMembershipGroups-carousel" class="carousel slide" data-ride="false" data-interval="false">
+    <div class="carousel-inner">
+      <%for (let i=0; i<myMembershipGroups.length; i+=3){%>
+        <%if (i == 0){%>
+          <div class="carousel-item active">
+        <%}else{%>
+          <div class="carousel-item">
+        <%}%>
+          <div class='row'>
+            <%for (let j=i; j<i+3 && j<myMembershipGroups.length; j++){%>
+              <div class="pricing-column col-lg-4 col-md-6">
+                <div class="card">
+                  <div class='card-header'>
+                    <h3><%=myMembershipGroups[j].name%></h3>
+                  </div>
+                  <div class='card-body'>
+                    <p><%=myMembershipGroups[j].description%></p>
+                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                  </div>
+                </div>
+              </div>
+            <%}%>
+          </div>
+        </div>
+      <%}%>
+    <a class="carousel-control-prev" href="#myMembershipGroups-carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#myMembershipGroups-carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+  </div>
+</section>
+<hr>
+
+<h1>Other Available Groups</h1>
+<section id="otherGroups">
+  <div id="otherGroups-carousel" class="carousel slide" data-ride="false" data-interval="false">
+    <div class="carousel-inner">
+      <%for (let i=0; i<otherGroups.length; i+=3){%>
+        <%if (i == 0){%>
+          <div class="carousel-item active">
+        <%}else{%>
+          <div class="carousel-item">
+        <%}%>
+          <div class='row'>
+            <%for (let j=i; j<i+3 && j<otherGroups.length; j++){%>
+              <div class="pricing-column col-lg-4 col-md-6">
+                <div class="card">
+                  <div class='card-header'>
+                    <h3><%=otherGroups[j].name%></h3>
+                  </div>
+                  <div class='card-body'>
+                    <p><%=otherGroups[j].description%></p>
+                    <button class="btn btn-block btn-dark" type="button">View More</button>
+                    <a class="btn btn-success btn-block" role="button" href= "/group/join"> Join Group </a>
+                  </div>
+                </div>
+              </div>
+            <%}%>
+          </div>
+        </div>
+      <%}%>
+    <a class="carousel-control-prev" href="#otherGroups-carousel" role="button" data-slide="prev">
+      <span class="carousel-control-prev-icon"></span>
+    </a>
+    <a class="carousel-control-next" href="#otherGroups-carousel" role="button" data-slide="next">
+      <span class="carousel-control-next-icon"></span>
+    </a>
+  </div>
+</section>
+<hr>
+
+
+<p>
+  <button class="btn btn-lg btn-dark" type="button" data-toggle="collapse" data-target="#addgroupform" aria-expanded="false" aria-controls="collapseExample">
+    <i class="fas fa-plus-circle"></i> Create a New Group
+  </button>
+</p>
+<div class="collapse" id="addgroupform">
+  <div class="card card-body">
+    <form class="" action="/groups" method="post">
+      <div class="form-group">
+        <label>Title</label>
+        <input class="form-control" type="text" name="groupName">
+        <label>Post</label>
+        <textarea class="form-control" name="groupDescription" rows="5" cols="30"></textarea>
+      </div>
+      <button class="btn btn-dark" type="submit" name="button">Publish</button>
+    </form>
+  </div>
+</div>
 <%- include('partials/footer') %>

@@ -17,3 +17,19 @@ body {
   color: #fff;
   background-color: #000;
 }
+
+.carousel-control-next,
+.carousel-control-prev {
+    filter: invert(100%);
+}
+
+.carousel-inner{
+  padding-right: 10%;
+  padding-left: 10%;
+}
+#myGroups{
+  background-color: #e6ffff;
+}
+#myMembershipGroups{
+  background-color: #ffffff;
+}

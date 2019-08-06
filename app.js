@@ -27,12 +27,20 @@ app.use(passport.session());//use passport for dealing with the session
 mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
 mongoose.set("useCreateIndex", true);
 
+const groupSchema = new mongoose.Schema({
+  name: String,
+  description: String,
+  creatorId: String,
+  posts: [],
+  members:[] //Member will be an object with id, type(owner, member, creator). Creator is also the owner.
+});
+const Group = mongoose.model("Group", groupSchema);
+
 const postsSchema = new mongoose.Schema({
   title: String,
   description: String,
   type: String
 });
-
 const Post = mongoose.model("Post", postsSchema);
 
 const userSchema = new mongoose.Schema({
@@ -44,7 +52,6 @@ const userSchema = new mongoose.Schema({
 });
 userSchema.plugin(passportLocalMongoose);
 userSchema.plugin(findOrCreate);
-
 const User = mongoose.model("User", userSchema);
 
 // use static authenticate method of model in LocalStrategy
@@ -73,8 +80,7 @@ passport.use(new GoogleStrategy({
     });
   }
 ));
-console.log(process.env.FACEBOOK_APP_ID)
-console.log(process.env.FACEBOOK_CLIENT_SECRET)
+
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
@@ -103,19 +109,54 @@ app.get('/auth/google/secrets',
   passport.authenticate('google', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/secrets');
+    res.redirect('/groups');
   });
 
 app.get('/auth/facebook/secrets',
   passport.authenticate('facebook', { failureRedirect: '/login' }),
   function(req, res) {
     // Successful authentication, redirect home.
-    res.redirect('/secrets');
+    res.redirect('/groups');
   });
 
+  app.get("/groups", function(req,res){
+    if (req.isAuthenticated()){
+      const myOwnedGroups = [];
+      const myMembershipGroups = [];
+      const otherGroups = [];
+
+      Group.find({}, function(error, foundGroups){
+        if (error){
+          console.log(error);
+        }else{
+          foundGroups.forEach(function(group){
+            if(group.creatorId == req.user._id){
+              myOwnedGroups.push(group);
+            }else if(group.members.includes(req.user._id)){
+              myMembershipGroups.push(group);
+            } else{
+              otherGroups.push(group);
+            }
+          })
+          console.log(myOwnedGroups);
+          console.log(myMembershipGroups);
+          console.log(otherGroups);
+          res.render("groups", {myGroups: myOwnedGroups, myMembershipGroups: myMembershipGroups, otherGroups:otherGroups});
+          //creatorId:req.user._id
+        }
+      });
+    } else{
+      res.redirect("/login");
+    }
+  });
 
 app.get("/login", function(req, res){
   res.render("login");
+});
+
+app.get("/logout", function(req,res){
+  req.logout();
+  res.redirect("/");
 });
 
 app.get("/register", function(req, res){
@@ -143,21 +184,6 @@ app.get("/secrets", function(req,res){
   })
 });
 
-app.get("/logout", function(req,res){
-  req.logout();
-  res.redirect("/");
-});
-
-
-app.get("/submit", function(req, res){
-  if(req.isAuthenticated()){
-    res.render("submit");
-  } else{
-    res.redirect("/login");
-  }
-});
-
-
 app.get("/secrets/:title", function(req,res){
   posts = [];
   // User.find({ "posts.$.title": req.params.title}, {'posts.$' : 1}, function(err, foundPosts){
@@ -184,6 +210,64 @@ app.get("/secrets/:title", function(req,res){
 
         console.log(foundUsers);
       }
+    }
+  })
+});
+
+app.get("/submit", function(req, res){
+  if(req.isAuthenticated()){
+    res.render("submit");
+  } else{
+    res.redirect("/login");
+  }
+});
+
+app.post("/groups", function(req, res){
+  //console.log("Inside the current test");
+  //console.log(req.user._id);
+  if (req.isAuthenticated()){
+    //Save the group into mygroup db
+    const newGroup = new Group({
+      name: req.body.groupName,
+      description: req.body.groupDescription,
+      creatorId: req.user._id
+    });
+    newGroup.save();
+    res.redirect("groups");
+  } else{
+    res.redirect("/login");
+  }
+});
+
+app.post("/login", function(req, res){
+
+  const user = new User({
+    username: req.body.username,
+    password: req.body.password
+  });
+
+  req.login(user, function(err){
+    if (err){
+      console.log(err);
+    }else{
+      passport.authenticate("local")(req,res,function(){
+        res.redirect("/secrets");
+      });
+    }
+  });
+});
+
+
+
+app.post("/register", function(req, res){
+  User.register({username: req.body.username}, req.body.password, function(err, user){
+    if (err){
+      console.log(err);
+      res.redirect("/register");
+    } else{
+      passport.authenticate("local")(req, res, function(){
+        res.redirect("/secrets");
+      })
     }
   })
 });
@@ -216,41 +300,6 @@ app.post("/submit", function(req, res){
     }
   })
 });
-
-app.post("/register", function(req, res){
-  User.register({username: req.body.username}, req.body.password, function(err, user){
-    if (err){
-      console.log(err);
-      res.redirect("/register");
-    } else{
-      passport.authenticate("local")(req, res, function(){
-        res.redirect("/secrets");
-      })
-    }
-
-  })
-
-});
-
-app.post("/login", function(req, res){
-
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password
-  });
-
-  req.login(user, function(err){
-    if (err){
-      console.log(err);
-    }else{
-      passport.authenticate("local")(req,res,function(){
-        res.redirect("/secrets");
-      });
-    }
-  });
-
-});
-
 
 app.listen(3000, function(){
   console.log("Server is running on port 3000");
