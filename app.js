@@ -10,6 +10,7 @@ const passportLocalMongoose = require("passport-local-mongoose");
 const GoogleStrategy = require('passport-google-oauth20').Strategy;
 const findOrCreate = require('mongoose-findorcreate');
 const FacebookStrategy = require('passport-facebook').Strategy;
+const _ = require('lodash');
 
 const app = express();
 app.use(express.static("public"));
@@ -47,6 +48,7 @@ const userSchema = new mongoose.Schema({
   email: String,
   password: String,
   googleId: String,
+  facebookId:String,
   posts:[],
   groups: []
 });
@@ -84,12 +86,19 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/secrets"
+    callbackURL: "http://localhost:3000/auth/facebook/secrets",
+    profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
-    console.log(profile);
+    console.log(profile.id);
     User.findOrCreate({facebookId: profile.id }, function (err, user) {
-      return cb(err, user);
+      if (err){
+        // console.log("Error saving facebook ID");
+        console.log(err);
+      } else{
+        return cb(err, user);
+      }
+
     });
   }
 ));
@@ -103,7 +112,7 @@ app.get("/auth/google",
   passport.authenticate("google", {scope: ["profile"]}));
 
 app.get('/auth/facebook',
-  passport.authenticate('facebook'));
+  passport.authenticate('facebook', {scope:["public_profile"]}));
 
 app.get('/auth/google/secrets',
   passport.authenticate('google', { failureRedirect: '/login' }),
@@ -165,56 +174,54 @@ app.get("/register", function(req, res){
 
 app.get("/secrets", function(req,res){
   posts = [];
+  console.log("In secrets get");
   console.log(req.body);
-  User.find({"posts":{$ne:null}}, function(error, foundUsers){
-    if (error){
-      console.log(error);
-    } else{
-      if (foundUsers){
-        foundUsers.forEach(function(user){
-          user.posts.forEach(function(post){
-            if (post.type == "events"){
-              posts.push(post);
-            }
-          })
-        })
-        res.render("secrets", {posts: posts});
-      }
-    }
-  })
+  // User.find({"posts":{$ne:null}}, function(error, foundUsers){
+  //   if (error){
+  //     console.log(error);
+  //   } else{
+  //     if (foundUsers){
+  //       foundUsers.forEach(function(user){
+  //         user.posts.forEach(function(post){
+  //           if (post.type == "event"){
+  //             posts.push(post);
+  //           }
+  //         })
+  //       })
+  //       res.render("secrets", {posts: posts, groupID:[]});
+  //     }
+  //   }
+  // })
 });
 
-app.get("/secrets/:title", function(req,res){
+app.get("/posts/:groupID/:postType", function(req,res){
   posts = [];
-  // User.find({ "posts.$.title": req.params.title}, {'posts.$' : 1}, function(err, foundPosts){
-  //   if (err){
-  //     console.log(err);
-  //   } else{
-  //     console.log(foundPosts);
-  //   }
-  // });
-  console.log(req.params.title);
-  User.find({"posts":{$ne:null}}, function(error, foundUsers){
-    if (error){
-      console.log(error);
+  console.log("In secrets get groupid + type")
+  // console.log(typeof(req.params[0]));
+  console.log(req.params);
+  const groupID = req.params.groupID;
+  Group.findById(groupID, function(err, foundGroup){
+    if (err){
+      console.log("Got error");
+      console.log(err);
     } else{
-      if (foundUsers){
-        foundUsers.forEach(function(user){
-          user.posts.forEach(function(post){
-            if (post.type == req.params.title){
-              posts.push(post);
-            }
-          })
-        })
-        res.render("secrets", {posts: posts});
-
-        console.log(foundUsers);
+      if (foundGroup.posts){
+        console.log("found matching posts")
+        foundGroup.posts.forEach(function(post){
+          if(_.lowerCase(post.type) == _.lowerCase(req.params.postType)){
+            posts.push(post);
+          }
+        });
       }
+      res.render("secrets", {posts: posts, groupID:groupID});
     }
-  })
+  });
+
 });
 
 app.get("/submit", function(req, res){
+  console.log("Body on submit get");
+  console.log(req.body);
   if(req.isAuthenticated()){
     res.render("submit");
   } else{
@@ -251,7 +258,7 @@ app.post("/login", function(req, res){
       console.log(err);
     }else{
       passport.authenticate("local")(req,res,function(){
-        res.redirect("/secrets");
+        res.redirect("/groups");
       });
     }
   });
@@ -266,38 +273,68 @@ app.post("/register", function(req, res){
       res.redirect("/register");
     } else{
       passport.authenticate("local")(req, res, function(){
-        res.redirect("/secrets");
+        res.redirect("/groups");
       })
     }
   })
 });
 
 app.post("/submit", function(req, res){
-  const title = req.body.title;
-  const description = req.body.description;
-  const type = req.body.type;
-
-  const newPost  = new Post({
-    title: title,
-    description: description,
-    type: type
-  });
-
-  User.findById(req.user.id, function(err, foundUser){
-    if (err){
-      console.log(err);
-    } else{
-      if (foundUser){
-        if (foundUser.posts){
-          foundUser.posts.push(newPost);
-        } else{
-          foundUser.posts = [newPost];
+  if (req.isAuthenticated()){
+    console.log("Logger on submit post");
+    console.log(req.body);
+    const title = req.body.postName;
+    const description = req.body.postDescription;
+    const type = req.body.postType;
+    const newPost  = new Post({
+      title: title,
+      description: description,
+      type: type
+    });
+    const posts = [];
+    Group.findById(req.body.groupID, function(err, foundGroup){
+      if (err){
+        console.log(err);
+      } else{
+        if (foundGroup.posts){
+          foundGroup.posts.push(newPost);
+        }else{
+          foundGroup.posts = [newPost];
         }
-        foundUser.save(function(){
-          res.redirect("/secrets");
-        })
+        foundGroup.save();
+        foundGroup.posts.forEach(function(post){
+          if (_.lowerCase(post.type) == _.lowerCase(newPost.type)){
+            posts.push(post);
+          }
+        });
+        res.render("secrets", {groupID:req.body.groupID, posts:posts});
       }
-    }
+    });
+  }else{
+    res.redirect("/");
+  }
+});
+
+app.post("/secrets", function(req, res){
+  console.log("In secret post");
+  console.log(req.body);
+  //Get all posts with the groupID and then call get Secret with posts params
+  posts = [];
+  Group.find({_id:req.body.groupID}, function(error, foundGroup){
+    if (error){
+      console.log(error);
+    } else{
+        if (foundGroup.posts){
+          foundGroup.posts.forEach(function(post){
+            if (post.type == "events"){
+              posts.push(post);
+            }
+          })
+        }else{
+          console.log("No posts found in secrets post");
+        }
+        res.render("secrets", {posts: posts, groupID: req.body.groupID});
+      }
   })
 });
 
