@@ -2,10 +2,38 @@
 body {
   background-image: linear-gradient(-90deg, #e6ffff, #ffffff);
 }
-
+h1{
+  margin: 3%;
+}
+section{
+  padding:5%;
+}
+.add-group-btn{
+  margin: auto;
+  display:block;
+  margin-top: 5%;
+}
 .centered {
     padding-top: 200px;
     text-align: center;
+}
+.carousel-control-next,
+.carousel-control-prev {
+    filter: invert(100%);
+}
+
+.carousel-inner{
+  padding-right: 10%;
+  padding-left: 10%;
+}
+
+.createPostButton{
+  padding: 5%;
+}
+.group-logout-btn{
+  margin:auto;
+  margin-top: 5%;
+  display:block;
 }
 .main-display{
   text-align: center;
@@ -17,17 +45,8 @@ body {
   color: #fff;
   background-color: #000;
 }
-
-.carousel-control-next,
-.carousel-control-prev {
-    filter: invert(100%);
-}
-
-.carousel-inner{
-  padding-right: 10%;
-  padding-left: 10%;
-}
 #myGroups{
+  margin-top: 60px;
   background-color: #e6ffff;
 }
 #myMembershipGroups{
