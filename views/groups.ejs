@@ -1,10 +1,4 @@
 <%- include('partials/header') %>
-<nav class="navbar navbar-light fixed-top bg-dark">
-  <form class="form-inline">
-    <a class="btn btn-lg btn-dark group-top-btn" role="button" href="/" name="homeButton">Go Home</a>
-  </form>
-</nav>
-</div>
 
 <section id="myGroups">
   <h1>Created by me</h1>
@@ -26,6 +20,7 @@
                   <div class='card-body'>
                     <p><%=myGroups[j].description%></p>
                     <a class="btn btn-block btn-dark" role="button" href="/posts/<%=myGroups[j]._id%>/event" name="viewButton">View More</a>
+                    <a class="btn btn-block btn-danger" role="button" href="/delete/<%=myGroups[j]._id%>" name="deleteButton">Delete Group</a>
                   </div>
                 </div>
               </div>
@@ -82,7 +77,8 @@
                   </div>
                   <div class='card-body'>
                     <p><%=myMembershipGroups[j].description%></p>
-                    <a class="btn btn-block btn-dark" role="button" href="/secrets">View More</a>
+                    <a class="btn btn-block btn-dark" role="button" href="/posts/<%=myMembershipGroups[j]._id%>/event" name="viewButton">View More</a>
+                    <a class="btn btn-warning btn-block" role="button" href= "/leave/<%=myMembershipGroups[j]._id%>"> Leave Group </a>
                   </div>
                 </div>
               </div>
@@ -120,8 +116,7 @@
                   </div>
                   <div class='card-body'>
                     <p><%=otherGroups[j].description%></p>
-                    <a class="btn btn-block btn-dark" role="button" href="/secrets">View More</a>
-                    <a class="btn btn-success btn-block" role="button" href= "/group/join"> Join Group </a>
+                    <a class="btn btn-success btn-block" role="button" href= "/join/<%=otherGroups[j]._id%>"> Join Group </a>
                   </div>
                 </div>
               </div>
