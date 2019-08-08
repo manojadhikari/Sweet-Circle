@@ -12,6 +12,7 @@ section{
   margin: auto;
   display:block;
   margin-top: 5%;
+  margin-bottom: 2px;
 }
 .centered {
     padding-top: 200px;
@@ -37,6 +38,7 @@ section{
 }
 .main-display{
   text-align: center;
+  background-color: #e6ffff;
 }
 
 .secret-text {
@@ -51,4 +53,12 @@ section{
 }
 #myMembershipGroups{
   background-color: #ffffff;
+}
+
+.top-button-secrets{
+  margin-top: 90px;
+}
+
+.body-content{
+  padding-left: 50px;
 }
