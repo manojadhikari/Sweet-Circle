@@ -1,5 +1,18 @@
 <%- include('partials/header') %>
 
+<div class="card">
+  <div class="card-body">
+    <form action="/search" method="POST">
+      <!-- Search form -->
+      <div class="md-form active-pink active-pink-2 mb-3 mt-0">
+        <input class="form-control" type="text" placeholder="Search for a Group" aria-label="Search">
+      </div>
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+  </div>
+</div>
+
+
 <section id="myGroups">
   <h1>Created by me</h1>
   <div id="myGroups-carousel" class="carousel slide" data-ride="false" data-interval="false">

@@ -275,9 +275,7 @@ app.get("/posts/:groupID/:postType", function(req,res){
       if (foundGroup.posts){
         console.log("found matching posts")
         foundGroup.posts.forEach(function(post){
-          if(_.lowerCase(post.type) == _.lowerCase(req.params.postType)){
             posts.push(post);
-          }
         });
       }
       res.render("secrets", {posts: posts, groupID:groupID});
@@ -352,29 +350,27 @@ app.post("/submit", function(req, res){
     console.log(req.body);
     const title = req.body.postName;
     const description = req.body.postDescription;
-    const type = req.body.postType;
     const newPost  = new Post({
       title: title,
-      description: description,
-      type: type
+      description: description
     });
     const posts = [];
     Group.findById(req.body.groupID, function(err, foundGroup){
       if (err){
         console.log(err);
       } else{
-        if (foundGroup.posts){
-          foundGroup.posts.push(newPost);
-        }else{
-          foundGroup.posts = [newPost];
+          if (foundGroup){
+            if (foundGroup.posts){
+              foundGroup.posts.push(newPost);
+            }else{
+              foundGroup.posts = [newPost];
+            }
+            foundGroup.save();
+            foundGroup.posts.forEach(function(post){
+                posts.push(post);
+            });
+            res.render("secrets", {groupID:req.body.groupID, posts:posts});
         }
-        foundGroup.save();
-        foundGroup.posts.forEach(function(post){
-          if (_.lowerCase(post.type) == _.lowerCase(newPost.type)){
-            posts.push(post);
-          }
-        });
-        res.render("secrets", {groupID:req.body.groupID, posts:posts});
       }
     });
   }else{
