@@ -30,7 +30,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());//use passport for dealing with the session
 
-mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-manoj:Test123@learn-together-uomac.mongodb.net/userDB", {useNewUrlParser: true});
 mongoose.set("useCreateIndex", true);
 
 const groupSchema = new mongoose.Schema({
@@ -401,6 +401,6 @@ app.post("/secrets", function(req, res){
   })
 });
 
-app.listen(3000, function(){
+app.listen(process.env.PORT || 3000, function(){
   console.log("Server is running on port 3000");
 });
