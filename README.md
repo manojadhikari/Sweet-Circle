@@ -23,7 +23,7 @@
 This is a web based application that provides a common platform for students to collaborate. It is a convienient way to recieve assistance with homework and classwork. Students can also study together during tests. Teachers can share classroom materials and resources related to internships and scholarships. Parents can also join the school community and keep up with the latest resources. Users can sign up using Google, Facebook, or their e-mail address. It is hosted on heroku. Click the <a href="https://huskyroom.herokuapp.com/">link</a> to play with a demo.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See the link:------------------ for to play with  live system. You can also clone the project in you machine and run it. To run perform the following steps:
+These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See the <a href="https://huskyroom.herokuapp.com/">link</a> to play with  live system. You can also clone the project in you machine and run it. To run perform the following steps:
 1. Clone the project in your machine.
 2. Install npm and node.js.
 3. Navigate to the root of downloaded project using terminal.
