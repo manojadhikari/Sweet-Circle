@@ -3,11 +3,11 @@
  <img width=200px height=200px src="https://i.imgur.com/6wj0hh6.jpg" alt="Project logo"></a>
 </p>
 
-<h3 align="center">Sweet Circle</h3>
+<h3 align="center">Learn Together</h3>
 
 ---
 
-<p align="center"> Few lines describing your project.
+<p align="center"> Extending Collaboration Beyond Classrooms!
     <br> 
 </p>
 
@@ -20,7 +20,7 @@
 - [Acknowledgments](#acknowledgement)
 
 ## 🧐 About <a name = "about"></a>
-This is a web based application that provides a commong platform for people to form communities. It is a convienient way to share/find information on events, jobs, housing and other topics with their community. Users can sign up using Google, Facebook, or their e-mail address. It is hosted on heroku. Click the link to play with a demo.
+This is a web based application that provides a common platform for students to collaborate. It is a convienient way to recieve assistance with homework and classwork. Students can also study together during tests. Teachers can share classroom materials and resources related to internships and scholarships. Parents can also join the school community and keep up with the latest resources. Users can sign up using Google, Facebook, or their e-mail address. It is hosted on heroku. Click the <a href="https://huskyroom.herokuapp.com/">link</a> to play with a demo.
 
 ## 🏁 Getting Started <a name = "getting_started"></a>
 These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See the link:------------------ for to play with  live system. You can also clone the project in you machine and run it. To run perform the following steps:
