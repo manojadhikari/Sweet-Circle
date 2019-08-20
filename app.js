@@ -30,7 +30,7 @@ app.use(session({
 app.use(passport.initialize());
 app.use(passport.session());//use passport for dealing with the session
 
-mongoose.connect("mongodb://localhost:27017/userDB", {useNewUrlParser: true});
+mongoose.connect("mongodb+srv://admin-manoj:Test123@learn-together-uomac.mongodb.net/userDB", {useNewUrlParser: true});
 mongoose.set("useCreateIndex", true);
 
 const groupSchema = new mongoose.Schema({
@@ -43,7 +43,6 @@ const groupSchema = new mongoose.Schema({
 const Group = mongoose.model("Group", groupSchema);
 
 const postsSchema = new mongoose.Schema({
-  title: String,
   description: String,
   type: String
 });
@@ -77,7 +76,7 @@ passport.deserializeUser(function(id, done) {
 passport.use(new GoogleStrategy({
     clientID: process.env.CLIENT_ID,
     clientSecret: process.env.CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/google/secrets",
+    callbackURL: "https://huskyroom.herokuapp.com/auth/google/secrets",
     userProfileURL: "https://www.googleapis.com/oauth2/v3/userinfo"
   },
   function(accessToken, refreshToken, profile, cb) {
@@ -91,7 +90,7 @@ passport.use(new GoogleStrategy({
 passport.use(new FacebookStrategy({
     clientID: process.env.FACEBOOK_APP_ID,
     clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
-    callbackURL: "http://localhost:3000/auth/facebook/secrets",
+    callbackURL: "https://huskyroom.herokuapp.com/auth/facebook/secrets",
     profileFields: ['id', 'displayName', 'photos', 'email']
   },
   function(accessToken, refreshToken, profile, cb) {
@@ -275,9 +274,7 @@ app.get("/posts/:groupID/:postType", function(req,res){
       if (foundGroup.posts){
         console.log("found matching posts")
         foundGroup.posts.forEach(function(post){
-          if(_.lowerCase(post.type) == _.lowerCase(req.params.postType)){
             posts.push(post);
-          }
         });
       }
       res.render("secrets", {posts: posts, groupID:groupID});
@@ -292,7 +289,7 @@ app.get("/submit", function(req, res){
   if(req.isAuthenticated()){
     res.render("submit");
   } else{
-    res.redirect("/login");
+    res.redirect("/");
   }
 });
 
@@ -302,16 +299,43 @@ app.post("/groups", function(req, res){
   if (req.isAuthenticated()){
     //Save the group into mygroup db
     const newGroup = new Group({
-      name: req.body.groupName,
+      name: _.startCase(_.toLower(req.body.groupName)),
       description: req.body.groupDescription,
       creatorId: req.user._id
     });
     newGroup.save();
     res.redirect("groups");
   } else{
-    res.redirect("/login");
+    res.redirect("/");
   }
 });
+
+app.post("/groups/search", function(req, res){
+  //console.log("Inside the current test");
+  //console.log(req.user._id);
+  if (req.isAuthenticated()){
+    //Save the group into mygroup db
+    groupName = _.startCase(_.toLower(req.body.groupName))
+    console.log("In groups/search")
+    console.log(groupName)
+    Group.find({name: groupName}, function(error, foundGroup){
+      if (error){
+        console.log(error);
+      } else{
+          if (foundGroup){
+            console.log("redirecting to search page")
+            res.render("search", {group: foundGroup})
+          }else{
+            console.log("No groups found while searching");
+            res.redirect("/groups")
+          }
+        }
+    })
+  } else{
+    res.redirect("/");
+  }
+});
+
 
 app.post("/login", function(req, res){
 
@@ -350,31 +374,28 @@ app.post("/submit", function(req, res){
   if (req.isAuthenticated()){
     console.log("Logger on submit post");
     console.log(req.body);
-    const title = req.body.postName;
     const description = req.body.postDescription;
-    const type = req.body.postType;
     const newPost  = new Post({
-      title: title,
-      description: description,
-      type: type
+      description: description
     });
     const posts = [];
     Group.findById(req.body.groupID, function(err, foundGroup){
       if (err){
         console.log(err);
       } else{
-        if (foundGroup.posts){
-          foundGroup.posts.push(newPost);
-        }else{
-          foundGroup.posts = [newPost];
+          if (foundGroup){
+            if (foundGroup.posts){
+              foundGroup.posts.push(newPost);
+            }else{
+              foundGroup.posts = [newPost];
+            }
+            foundGroup.save();
+            foundGroup.posts.forEach(function(post){
+                posts.push(post);
+            });
+            posts.reverse();
+            res.render("secrets", {groupID:req.body.groupID, posts:posts});
         }
-        foundGroup.save();
-        foundGroup.posts.forEach(function(post){
-          if (_.lowerCase(post.type) == _.lowerCase(newPost.type)){
-            posts.push(post);
-          }
-        });
-        res.render("secrets", {groupID:req.body.groupID, posts:posts});
       }
     });
   }else{
@@ -405,6 +426,11 @@ app.post("/secrets", function(req, res){
   })
 });
 
-app.listen(3000, function(){
-  console.log("Server is running on port 3000");
+let port = process.env.PORT
+if (port == null || port == ''){
+  port = 3000;
+}
+
+app.listen(port, function(){
+  console.log("Server has started successfully!");
 });
