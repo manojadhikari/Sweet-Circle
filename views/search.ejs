@@ -1,0 +1,41 @@
+<%- include('partials/header') %>
+<%if (group.length > 0){%>
+<h3> Here are your search results <h3>
+<%} else{%>
+<h3> Can't find a group with that name <h3>
+<%}%>
+
+<div id="groups-carousel" class="carousel slide" data-ride="false" data-interval="false">
+  <div class="carousel-inner">
+    <%for (let i=0; i<group.length; i+=3){%>
+      <%if (i == 0){%>
+        <div class="carousel-item active">
+      <%}else{%>
+        <div class="carousel-item">
+      <%}%>
+        <div class='row'>
+          <%for (let j=i; j<i+3 && j<group.length; j++){%>
+            <div class="pricing-column col-lg-4 col-md-6">
+              <div class="card">
+                <div class='card-header'>
+                  <h3><%=group[j].name%></h3>
+                </div>
+                <div class='card-body'>
+                  <p><%=group[j].description%></p>
+                  <a class="btn btn-block btn-dark" role="button" href="/posts/<%=group[j]._id%>/event" name="viewButton">View More</a>
+                </div>
+              </div>
+            </div>
+          <%}%>
+        </div>
+      </div>
+    <%}%>
+  <a class="carousel-control-prev" href="#groups-carousel" role="button" data-slide="prev">
+    <span class="carousel-control-prev-icon"></span>
+  </a>
+  <a class="carousel-control-next" href="#groups-carousel" role="button" data-slide="next">
+    <span class="carousel-control-next-icon"></span>
+  </a>
+</div>
+
+<%- include('partials/footer') %>

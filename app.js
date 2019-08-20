@@ -43,7 +43,6 @@ const groupSchema = new mongoose.Schema({
 const Group = mongoose.model("Group", groupSchema);
 
 const postsSchema = new mongoose.Schema({
-  title: String,
   description: String,
   type: String
 });
@@ -290,7 +289,7 @@ app.get("/submit", function(req, res){
   if(req.isAuthenticated()){
     res.render("submit");
   } else{
-    res.redirect("/login");
+    res.redirect("/");
   }
 });
 
@@ -300,16 +299,43 @@ app.post("/groups", function(req, res){
   if (req.isAuthenticated()){
     //Save the group into mygroup db
     const newGroup = new Group({
-      name: req.body.groupName,
+      name: _.startCase(_.toLower(req.body.groupName)),
       description: req.body.groupDescription,
       creatorId: req.user._id
     });
     newGroup.save();
     res.redirect("groups");
   } else{
-    res.redirect("/login");
+    res.redirect("/");
   }
 });
+
+app.post("/groups/search", function(req, res){
+  //console.log("Inside the current test");
+  //console.log(req.user._id);
+  if (req.isAuthenticated()){
+    //Save the group into mygroup db
+    groupName = _.startCase(_.toLower(req.body.groupName))
+    console.log("In groups/search")
+    console.log(groupName)
+    Group.find({name: groupName}, function(error, foundGroup){
+      if (error){
+        console.log(error);
+      } else{
+          if (foundGroup){
+            console.log("redirecting to search page")
+            res.render("search", {group: foundGroup})
+          }else{
+            console.log("No groups found while searching");
+            res.redirect("/groups")
+          }
+        }
+    })
+  } else{
+    res.redirect("/");
+  }
+});
+
 
 app.post("/login", function(req, res){
 
@@ -348,10 +374,8 @@ app.post("/submit", function(req, res){
   if (req.isAuthenticated()){
     console.log("Logger on submit post");
     console.log(req.body);
-    const title = req.body.postName;
     const description = req.body.postDescription;
     const newPost  = new Post({
-      title: title,
       description: description
     });
     const posts = [];
@@ -369,6 +393,7 @@ app.post("/submit", function(req, res){
             foundGroup.posts.forEach(function(post){
                 posts.push(post);
             });
+            posts.reverse();
             res.render("secrets", {groupID:req.body.groupID, posts:posts});
         }
       }
